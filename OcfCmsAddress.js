@@ -1,0 +1,1 @@
+var OcfCmsAddress = '0x696f1dc2a9a52f5274a0cd30df73adf84314acf8'
