@@ -33,19 +33,21 @@ var StartBlock = eth.blockNumber;
 var Message = "";
 Message = Message + "*****************************************************************************\n";
 Message = Message + "*****************************************************************************\n";
-Message = Message + "**        TestFamily1.js version: 0.5                                        **\n";
+Message = Message + "**        InitDemoData.js version: 0.5                                        **\n";
 Message = Message + "*****************************************************************************\n"
 Message = Message + "*****************************************************************************\n"
 Message = Message + "\n\n";
 
-CertString = '{"Cert":"OCF","Name":"Acme","DeviceName":"Boomerang"}'
+FamilyCNM = '{"Cert":"OCF","Name":"Acme","DeviceName":"Boomerang"}'
+FamilyCN = '{"Cert":"OCF","Name":"Acme"}'
+FamilyC = '{"Cert":"OCF"}'
 DeviceContainer = '{"Name":"Acme","PEN":"1234","DeviceName":"Boomerang","OcfDeviceType":"OcfClient","OcfVertical":"SmartHome","CRSL":"","CertId":"1234","CertData":"1/1/2018","SecurityProfile":"Black","OcfResourceType","Test"}'
 SwContainer1 = '{"SwName":"LinuxBoom","SwVer":"1.0"}'
 SwContainer2 = '{"SwName":"LinuxBoom","SwVer":"2.0"}'
 HwContainer1 = '{"Model":"BOOM-123","HwVer":"A","FwVer":"1.1","PlatformId":"AAA","PlatformAttribute":"BBB"}'
 HwContainer2 = '{"Model":"BOOM-123","HwVer":"B","FwVer":"1.2","PlatformId":"AAA","PlatformAttribute":"BBB"}'
 
-var ComplianceId = OcfCms.CalcComplianceId(CertString);
+var ComplianceId = OcfCms.CalcComplianceId(FamilyCNM);
 
 personal.unlockAccount(ContractOwner,ContractOwnerPassword);
 
@@ -83,6 +85,14 @@ else
 
 Message = Message + "\n*****************************************************************************\n"
 Message = Message + "Test: 2\n";
+Message = Message + "Write Family Tree\n";
+Message = Message + "*****************************************************************************\n"
+Message = Message + "OcfCms.WriteFamilyTree(FamilyC, FamilyCN, FamilyCNM, ComplianceId, {from:ContractOwner,gas:4700000});\n\n";
+var Trans = OcfCms.WriteFamilyTree(FamilyC, FamilyCN, FamilyCNM, ComplianceId, {from:ContractOwner,gas:4700000});
+Message = Message + "TransId: " + Trans + "\n";
+
+Message = Message + "\n*****************************************************************************\n"
+Message = Message + "Test: 3\n";
 Message = Message + "Write Device Container\n";
 Message = Message + "*****************************************************************************\n"
 Message = Message + "OcfCms.Write(ComplianceId, ComplianceId, 1/1/2020, DeviceContainer, 0, {from:ContractOwner,gas:4700000});\n\n";
@@ -90,7 +100,7 @@ var Trans = OcfCms.Write(ComplianceId, ComplianceId, "1/1/2020", DeviceContainer
 Message = Message + "TransId: " + Trans + "\n";
 
 Message = Message + "\n*****************************************************************************\n"
-Message = Message + "Test: 3\n";
+Message = Message + "Test: 4\n";
 Message = Message + "Write Hw Container 1\n";
 Message = Message + "*****************************************************************************\n"
 Message = Message + "OcfCms.WriteHwContainer(ComplianceId, HwContainer1, {from:ContractOwner,gas:4700000});\n\n";
@@ -98,7 +108,7 @@ var Trans = OcfCms.WriteHwContainer(ComplianceId, HwContainer1, {from:ContractOw
 Message = Message + "TransId: " + Trans + "\n";
 
 Message = Message + "\n*****************************************************************************\n"
-Message = Message + "Test: 4\n";
+Message = Message + "Test: 5\n";
 Message = Message + "Write Hw Container 2\n";
 Message = Message + "*****************************************************************************\n"
 Message = Message + "OcfCms.WriteHwContainer(ComplianceId, HwContainer2, {from:ContractOwner,gas:4700000});\n\n";
@@ -106,7 +116,7 @@ var Trans = OcfCms.WriteHwContainer(ComplianceId, HwContainer2, {from:ContractOw
 Message = Message + "TransId: " + Trans + "\n";
 
 Message = Message + "\n*****************************************************************************\n"
-Message = Message + "Test: 5\n";
+Message = Message + "Test: 6\n";
 Message = Message + "Write Sw Container 1\n";
 Message = Message + "*****************************************************************************\n"
 Message = Message + "OcfCms.WriteSwContainer(ComplianceId, SwContainer1, {from:ContractOwner,gas:4700000});\n\n";
@@ -114,11 +124,11 @@ var Trans = OcfCms.WriteSwContainer(ComplianceId, SwContainer1, {from:ContractOw
 Message = Message + "TransId: " + Trans + "\n";
 
 Message = Message + "\n*****************************************************************************\n"
-Message = Message + "Test: 6\n";
+Message = Message + "Test: 7\n";
 Message = Message + "Write Sw Container 2\n";
 Message = Message + "*****************************************************************************\n"
-Message = Message + "OcfCms.WriteSwContainer(ComplianceId, HwContainer2, {from:ContractOwner,gas:4700000});\n\n";
-var Trans = OcfCms.WriteSwContainer(ComplianceId, HwContainer2, {from:ContractOwner,gas:4700000});
+Message = Message + "OcfCms.WriteSwContainer(ComplianceId, SwContainer2, {from:ContractOwner,gas:4700000});\n\n";
+var Trans = OcfCms.WriteSwContainer(ComplianceId, SwContainer2, {from:ContractOwner,gas:4700000});
 
 var TimeOut = 0;
 while (TimeOut < MaxTimeOut)
@@ -142,6 +152,58 @@ else
   Message = Message + "FAIL\n";
   ErrorCount = ErrorCount + 1;
 }
+
+Message = Message + "*****************************************************************************\n"
+Message = Message + "Test: 8\n"
+Message = Message + "Read Model Details\n"
+Message = Message + "*****************************************************************************\n"
+Message = Message + "OcfCms.Read(ComplianceId);\n\n";
+var ModelDetails = OcfCms.Read(ComplianceId);
+
+Message = Message + "Tester: " + ModelDetails[0] + "\n";
+Message = Message + "MfgModelId: " + ModelDetails[1] + "\n";
+Message = Message + "ExpirationDate: " + ModelDetails[2] + "\n";
+Message = Message + "DeviceContainer: " + ModelDetails[3] + "\n";
+Message = Message + "Valid: " + ModelDetails[4] + "\n";
+Message = Message + "MfgCertHash: " + ModelDetails[5] + "\n";
+Message = Message + "SwContainerLength: " + ModelDetails[6] + "\n";
+Message = Message + "HwContainerLength: " + ModelDetails[7] + "\n";
+
+Message = Message + "*****************************************************************************\n"
+Message = Message + "Test: 9\n"
+Message = Message + "Read SwContainer Details\n"
+Message = Message + "*****************************************************************************\n"
+Message = Message + "OcfCms.ReadSwContainerIndex(ComplianceId,0);\n\n";
+var Container = OcfCms.ReadSwContainerIndex(ComplianceId,0);
+
+Message = Message + "Container: " + Container + "\n";
+
+Message = Message + "*****************************************************************************\n"
+Message = Message + "Test: 10\n"
+Message = Message + "Read SwContainer Details\n"
+Message = Message + "*****************************************************************************\n"
+Message = Message + "OcfCms.ReadSwContainerIndex(ComplianceId,1);\n\n";
+var Container = OcfCms.ReadSwContainerIndex(ComplianceId,1);
+
+Message = Message + "Container: " + Container + "\n";
+
+Message = Message + "*****************************************************************************\n"
+Message = Message + "Test: 11\n"
+Message = Message + "Read SwContainer Details\n"
+Message = Message + "*****************************************************************************\n"
+Message = Message + "OcfCms.ReadHwContainerIndex(ComplianceId,0);\n\n";
+var Container = OcfCms.ReadHwContainerIndex(ComplianceId,0);
+
+Message = Message + "Container: " + Container + "\n";
+
+Message = Message + "*****************************************************************************\n"
+Message = Message + "Test: 12\n"
+Message = Message + "Read HwContainer Details\n"
+Message = Message + "*****************************************************************************\n"
+Message = Message + "OcfCms.ReadHwContainerIndex(ComplianceId,1);\n\n";
+var Container = OcfCms.ReadHwContainerIndex(ComplianceId,1);
+
+Message = Message + "Container: " + Container + "\n";
 
 
 var StopBlock = eth.blockNumber;

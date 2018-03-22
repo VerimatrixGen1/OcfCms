@@ -437,37 +437,21 @@ contract OcfCms
     return;
   }
 
-  // ***************************************************************************
-  // TBD
-  // ***************************************************************************
-  
-
-  function Delete(address ComplianceModelId) public returns (bool Status)
-  {
-      Status = false;
-      return;
-  }
-  
   function DeleteHwContainer(address ComplianceModelId) public returns (bool Status)
   {
-      Status = false;
+      ComplianceArray[ComplianceModelId].HwContainer.length --;
+      Status = true;
       return;
   }
   
   function DeleteSwContainer(address ComplianceModelId) public returns (bool Status)
   {
-      Status = false;
+      ComplianceArray[ComplianceModelId].SwContainer.length --;
+      Status = true;
       return;
   }
 
 
-
-
-
-
-
-
-  
   function WriteFamily(string FamilyString, bool FamilyValid, address ComplianceId) public returns (bool Status)
   {
     address FamilyIndex;
@@ -559,7 +543,7 @@ contract OcfCms
   }
   
   // Cert, Name, Model, HwVer, FwVer
-  function WriteFamilyTree(string FamilyStringC, string FamilyStringCN, string FamilyStringCNM, string FamilyStringCNMH, string FamilyStringCNMHF, address ComplianceId) public returns (bool Status)
+  function WriteFamilyTree(string FamilyStringC, string FamilyStringCN, string FamilyStringCNM, address ComplianceId) public returns (bool Status)
   {
     if (!VerifyAdminId(msg.sender))
     {
@@ -567,41 +551,20 @@ contract OcfCms
       return;
     }
 
-    if (bytes(FamilyStringCNMHF).length > 0)
-    {
-      // CNMHF
-      WriteFamily(FamilyStringCNMHF, true, ComplianceId);
-      WriteSubFamily(FamilyStringCNMH, FamilyStringCNMHF, ComplianceId, true);
-      WriteSubFamily(FamilyStringCNM, FamilyStringCNMHF, ComplianceId, true);
-      //WriteSubFamily(FamilyStringCN, FamilyStringCNMHF, ComplianceId, true);
-      //WriteSubFamily(FamilyStringC, FamilyStringCNMHF, ComplianceId, true);
-    }
-    if (bytes(FamilyStringCNMH).length > 0)
-    {
-      // MMHF
-      WriteFamily(FamilyStringCNMH, true, 0);
-      WriteSubFamily(FamilyStringCNM, FamilyStringCNMH, 0, true);
-      //WriteSubFamily(FamilyStringCN, FamilyStringCNMH, 0, true);
-      //WriteSubFamily(FamilyStringC, FamilyStringCNMH, 0, true);
-    }
     if (bytes(FamilyStringCNM).length > 0)
     {
-      // MMHF
-      WriteFamily(FamilyStringCNM, true, 0);
-      WriteSubFamily(FamilyStringCN, FamilyStringCNM, 0, true);
-      //WriteSubFamily(FamilyStringC, FamilyStringCNM, 0, true);
+      WriteFamily(FamilyStringCNM, true, ComplianceId);
+      WriteSubFamily(FamilyStringCN, FamilyStringCNM, ComplianceId, true);
     }
 
     if (bytes(FamilyStringCN).length > 0)
     {
-      // MMHF
       WriteFamily(FamilyStringCN, true, 0);
       WriteSubFamily(FamilyStringC, FamilyStringCN, 0, true);
     }
       
     if (bytes(FamilyStringC).length > 0)
     {
-      // MMHF
       WriteFamily(FamilyStringC, true, 0);
     }
       
@@ -672,22 +635,6 @@ contract OcfCms
     return;
   }
   
-  function ImportTreeModelSku(string FamilyStringC, string FamilyStringCN, string ModelFamilyStringCNM, string ModelFamilyStringCNMH, 
-                  string ModelFamilyStringCNMHF, 
-                  string SkuFamilyStringCNM, string SkuFamilyStringCNMH, string SkuFamilyStringCNMHF,
-                  address ComplianceId) 
-                  public returns (bool Status)
-  {
-    if (!VerifyAdminId(msg.sender))
-    {
-      Status = false;
-      return;
-    }
-    Status = WriteFamilyTree(FamilyStringC, FamilyStringCN, ModelFamilyStringCNM, ModelFamilyStringCNMH, ModelFamilyStringCNMHF, ComplianceId);
-    Status = WriteFamilyTree(FamilyStringC, FamilyStringCN, SkuFamilyStringCNM, SkuFamilyStringCNMH, SkuFamilyStringCNMHF, ComplianceId);
-    return Status;
-
-  }
 
 }
 
